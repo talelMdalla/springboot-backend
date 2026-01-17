@@ -7,20 +7,17 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface WorkerRepository extends JpaRepository<Worker, Long> {
-    @Query("SELECT w FROM Worker w WHERE w.category = :category AND w.isAvailable = :available ORDER BY w.rating DESC")
-    List<Worker> findByCategoryAndAvailable(@Param("category") String category, @Param("available") boolean available);
-
-    @Query("SELECT w FROM Worker w JOIN FETCH w.user u WHERE w.category = :category ORDER BY w.rating DESC") // ✅ Fix : JOIN FETCH pour inclure profileImage en liste par catégorie
+    // ✅ Fix : Query pour workers par catégorie + JOIN fetch user (isAvailable au lieu de available)
+    @Query("SELECT w FROM Worker w LEFT JOIN FETCH w.user u WHERE w.category = :category AND w.isAvailable = true ORDER BY w.averageRating DESC")
     List<Worker> findAllByCategoryWithUser(@Param("category") String category);
 
-    @Query("SELECT w FROM Worker w JOIN FETCH w.user u WHERE w.category = :category AND w.governorate = :governorate ORDER BY w.rating DESC") // ✅ Fix : JOIN FETCH pour search
+    // ✅ Fix : Query pour search catégorie + governorate + JOIN fetch user (isAvailable)
+    @Query("SELECT w FROM Worker w LEFT JOIN FETCH w.user u WHERE w.category = :category AND w.governorate = :governorate AND w.isAvailable = true ORDER BY w.averageRating DESC")
     List<Worker> findByCategoryAndGovernorateWithUser(@Param("category") String category, @Param("governorate") String governorate);
 
-    // ✅ Fix : Query complète pour findByUserId
-    @Query("SELECT w FROM Worker w WHERE w.user.id = :userId")
-    Optional<Worker> findByUserId(@Param("userId") Long userId);
+    // ✅ Optionnel : Workers disponibles par catégorie (sans JOIN si perf issue)
+    List<Worker> findByCategoryAndIsAvailableTrue(String category);
 }

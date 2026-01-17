@@ -7,21 +7,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // ✅ Fix images : Serve /uploads comme static
+        // Servir les images uploadées
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/"); // Dossier uploads/ root projet
+                .addResourceLocations("file:uploads/");
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // ✅ Fix CORS : Global pour tous (OPTIONS pour preflight, * dev)
         registry.addMapping("/**")
-                .allowedOrigins("*") // Dev ; prod ton domaine
+                .allowedOrigins("*") // DEV uniquement
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*") // Authorization inclus
-                .allowCredentials(false)
-                .maxAge(3600); // Cache 1h
+                .allowedHeaders("*")
+                .allowCredentials(false) // obligatoire avec *
+                .maxAge(3600);
     }
 }

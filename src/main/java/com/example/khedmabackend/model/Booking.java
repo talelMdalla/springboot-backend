@@ -1,5 +1,6 @@
 package com.example.khedmabackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // ✅ Nouveau : Ignore client/worker pour éviter circular JSON
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -11,12 +12,14 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
+    @JsonIgnore // ✅ Ignore pour éviter circular dans JSON (controller map flat)
     private User client; // FK client_id
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "worker_id")
+    @JsonIgnore // ✅ Ignore pour éviter circular
     private Worker worker; // FK worker_id
 
     @Column(name = "date_time") // Map 'date' entity → "date_time" table column (pas NULL)
@@ -30,6 +33,8 @@ public class Booking {
 
     private String status = "PENDING"; // String pour "ACCEPTEE" / "REFUSEE"
 
+    private String service; // ✅ Fix : Ajout field service (ex. "Plomberie")
+
     @Transient
     @JsonProperty("clientId")
     private Long clientId;
@@ -41,13 +46,14 @@ public class Booking {
     // Constructors
     public Booking() {}
 
-    public Booking(User client, Worker worker, LocalDateTime date, String time, String location, Double price) {
+    public Booking(User client, Worker worker, LocalDateTime date, String time, String location, Double price, String service) {
         this.client = client;
         this.worker = worker;
         this.date = date;
         this.time = time;
         this.location = location;
         this.price = price;
+        this.service = service;
     }
 
     // Getters/Setters
@@ -74,6 +80,9 @@ public class Booking {
 
     public String getStatus() { return status; } // String
     public void setStatus(String status) { this.status = status; }
+
+    public String getService() { return service; } // ✅ Fix : Getter complet pour service
+    public void setService(String service) { this.service = service; }
 
     // Getters pour IDs
     public Long getClientId() { return client != null ? client.getId() : clientId; }

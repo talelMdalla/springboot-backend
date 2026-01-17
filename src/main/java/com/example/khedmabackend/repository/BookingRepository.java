@@ -10,11 +10,11 @@ import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    // ✅ Fix : Native SQL pour bookings par client email (join direct sur users.email)
-    @Query(value = "SELECT b.* FROM bookings b JOIN users c ON b.client_id = c.id WHERE c.email = :clientEmail", nativeQuery = true)
+    // ✅ Fix : JPQL pour bookings par client email (JOIN users.email)
+    @Query("SELECT b FROM Booking b JOIN b.client c WHERE c.email = :clientEmail ORDER BY b.date DESC")
     List<Booking> findByClientEmail(@Param("clientEmail") String clientEmail);
 
-    // ✅ Fix : Native SQL pour bookings par worker email (join worker.user.email)
-    @Query(value = "SELECT b.* FROM bookings b JOIN workers w ON b.worker_id = w.id JOIN users u ON w.user_id = u.id WHERE u.email = :workerEmail", nativeQuery = true)
+    // ✅ Fix : JPQL pour bookings par worker email (JOIN worker.user.email)
+    @Query("SELECT b FROM Booking b JOIN b.worker w JOIN w.user u WHERE u.email = :workerEmail ORDER BY b.date DESC")
     List<Booking> findByWorkerEmail(@Param("workerEmail") String workerEmail);
 }

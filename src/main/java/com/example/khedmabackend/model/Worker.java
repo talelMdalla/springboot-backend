@@ -23,8 +23,8 @@ public class Worker {
     private String governorate;
     private String description;
     private Double pricePerHour = 0.0;
-    private Double rating = 0.0;
-    private Integer reviewCount = 0;
+    private Double averageRating = 0.0; // ✅ Renommé : Rating moyen (étoiles 0-5, calculé via service)
+    private Integer reviewCount = 0; // ✅ Nombre total d'avis
     private Boolean isAvailable = true;
 
     @ElementCollection
@@ -32,6 +32,10 @@ public class Worker {
 
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
+
+    // ✅ Nouveau : Relation bidirectionnelle avec Review (lazy pour perf)
+    @OneToMany(mappedBy = "worker", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Review> reviews; // Liste avis (non chargée par défaut)
 
     // Constructors
     public Worker() {}
@@ -100,12 +104,12 @@ public class Worker {
         this.pricePerHour = pricePerHour;
     }
 
-    public Double getRating() {
-        return rating;
+    public Double getAverageRating() {
+        return averageRating;
     }
 
-    public void setRating(Double rating) {
-        this.rating = rating;
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 
     public Integer getReviewCount() {
@@ -139,4 +143,14 @@ public class Worker {
     public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
+
+    // ✅ Nouveau : Getters/setters pour reviews (bidirectionnel)
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
+    }
+
 }

@@ -45,7 +45,7 @@ public class UserService {
             }
             worker.setDateNaissance(dateNaissance);
             worker.setPricePerHour(30.0);
-            worker.setRating(4.5);
+            worker.setAverageRating(0.0); // ✅ Fix : setAverageRating au lieu de setRating (défaut 0 pour nouveau worker)
             worker.setReviewCount(0);
             worker.setAvailable(true);
             worker.setSkills(Arrays.asList("Défaut"));
